@@ -1,42 +1,38 @@
 package main
 
 import (
-	example "cli/example"
-	// "fmt"
-	// "database/sql"
-    _ "github.com/go-sql-driver/mysql"
+	"fmt"
+	"log"
+	"os"
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/jmoiron/sqlx"
 )
 
+type dbStore struct {
+	db *sqlx.DB
+}
+
 func main() {
-	// fmt.Println("database..")
+	fmt.Println("jjjjjjjjjjjjjjjd")
+	db := dbStore{}
+	err := db.Open()
 
-	// db, err := sql.Open("mysql", "root:@tcp(127.0.0.1:3306)/golangcli")
-	// if err != nil {
-    //     panic(err.Error())
-    // }
-	// defer db.Close()
-
-	// insert, err := db.Query("INSERT INTO test VALUES ( 2, 'TEST' )")
-    // if err != nil {
-    //     panic(err.Error())
-    // }
-    // defer insert.Close()
-	
-	example.Web()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "%s\n", err)
+		os.Exit(1)
+	}
 }
 
-func actionList() {
-	// call method list
+func (store *dbStore) Open() error {
+	db, err := sqlx.Connect("mysql", "root:@/golangcli")
+	if err != nil {
+		return err
+	}
+	log.Println("Connected to DB")
+	store.db = db
+	return nil
 }
 
-func actionAdd() {
-	// call method add
-}
-
-func actionDefine() {
-	// call method get
-}
-
-func actionRemove() {
-	// call method remove
+func (store *dbStore) Close() error {
+	return store.db.Close()
 }
