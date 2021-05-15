@@ -52,6 +52,8 @@ func main() {
 		actionList(&db)
 	case "action":
 		fmt.Println("case action.....")
+	case "add": 
+		actionAdd(&db, flag.Args())
 	default:
 		fmt.Printf("unknown action: %v", *action)
 	}
@@ -83,9 +85,12 @@ func actionList(store *dbStore) {
 	fmt.Printf("%v", entry)
 }
 
-func actionAdd() {
+func actionAdd(store *dbStore, args []string) {
 	// call method add
-
+	title := args[0]
+	definition := args[1]
+	store.Add(title, definition)
+	fmt.Println("Added to entry !")
 }
 
 func actionDefine() {
