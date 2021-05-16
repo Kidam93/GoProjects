@@ -7,14 +7,29 @@ import (
 )
 
 func main() {
-	fmt.Println("HANGMAN WELCOME!")
-	g := hangman.New("golang", 8)
-	fmt.Printf("game struct %v", g)
-	l, err := hangman.ReadGuess()
+	g, err := hangman.New(8, "Golang")
 	if err != nil {
-		fmt.Printf("error %v", err)
+		fmt.Printf("Could not create game: %v\n", err)
 		os.Exit(1)
 	}
-	hangman.Draw(g, l)
-	fmt.Println(l)
+
+	hangman.DrawWelcome()
+	guess := ""
+	for {
+		hangman.Draw(g, guess)
+
+		switch g.State {
+		case "won", "lost":
+			os.Exit(0)
+		}
+
+		l, err := hangman.ReadGuess()
+		if err != nil {
+			fmt.Printf("Could not read from terminal: %v", err)
+			os.Exit(1)
+		}
+		guess = l
+
+		g.MakeAGuess(guess)
+	}
 }

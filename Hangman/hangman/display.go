@@ -1,45 +1,163 @@
 package hangman
 
-import "fmt"
+import (
+	"fmt"
+)
 
-func Draw(g *Game, letter string) {
-	drawState(g)
-	drawLetters(g.FoundLetters, letter)
-	
-
+func DrawWelcome() {
+	fmt.Println(`
+	|\     /|(  ___  )( (    /|(  ____ \(       )(  ___  )( (    /|
+	| )   ( || (   ) ||  \  ( || (    \/| () () || (   ) ||  \  ( |
+	| (___) || (___) ||   \ | || |      | || || || (___) ||   \ | |
+	|  ___  ||  ___  || (\ \) || | ____ | |(_)| ||  ___  || (\ \) |
+	| (   ) || (   ) || | \   || | \_  )| |   | || (   ) || | \   |
+	| )   ( || )   ( || )  \  || (___) || )   ( || )   ( || )  \  |
+	|/     \||/     \||/    )_)(_______)|/     \||/     \||/    )_)
+	`)
 }
 
-func drawState(g *Game) {
-	draw := ""
-	turn := g.TurnLeft
-	switch turn {
+func Draw(g *Game, guess string) {
+	drawTurns(g.TurnsLeft)
+	drawState(g, guess)
+	fmt.Println()
+}
+
+func drawTurns(l int) {
+	var draw string
+	switch l {
 	case 0:
-		draw = "I"
+		draw = `
+    ____
+   |    |      
+   |    o      
+   |   /|\     
+   |    |
+   |   / \
+  _|_
+ |   |______
+ |          |
+ |__________|
+		`
 	case 1:
-		draw = "II"
+		draw = `
+    ____
+   |    |      
+   |    o      
+   |   /|\     
+   |    |
+   |    
+  _|_
+ |   |______
+ |          |
+ |__________|
+		`
 	case 2:
-		draw = "III"
+		draw = `
+    ____
+   |    |      
+   |    o      
+   |    |
+   |    |
+   |     
+  _|_
+ |   |______
+ |          |
+ |__________|
+		`
 	case 3:
-		draw = "IV"
+		draw = `
+    ____
+   |    |      
+   |    o      
+   |        
+   |   
+   |   
+  _|_
+ |   |______
+ |          |
+ |__________|
+		`
 	case 4:
-		draw = "V"
+		draw = `
+    ____
+   |    |      
+   |      
+   |      
+   |  
+   |  
+  _|_
+ |   |______
+ |          |
+ |__________|
+		`
 	case 5:
-		draw = "VI"
+		draw = `
+    ____
+   |        
+   |        
+   |        
+   |   
+   |   
+  _|_
+ |   |______
+ |          |
+ |__________|
+		`
 	case 6:
-		draw = "VII"
+		draw = `
+    
+   |     
+   |     
+   |     
+   |
+   |
+  _|_
+ |   |______
+ |          |
+ |__________|
+		`
 	case 7:
-		draw = "VIII"
+		draw = `
+  _ _
+ |   |______
+ |          |
+ |__________|
+		`
 	case 8:
-		draw = "IX"
-	default:
-		draw = "X"
+		draw = `
+
+		`
 	}
 	fmt.Println(draw)
 }
 
-func drawLetters(found []string, letter string) {
-	for _, l := range(found) {
-		fmt.Print(l)
+func drawLetters(g []string) {
+	for _, c := range g {
+		fmt.Printf("%v ", c)
 	}
-	fmt.Println("")
+	fmt.Println()
+}
+
+func drawState(g *Game, guess string) {
+	fmt.Print("Guessed: ")
+	drawLetters(g.FoundLetters)
+
+	fmt.Print("Used: ")
+	drawLetters(g.UsedLetters)
+
+	switch g.State {
+	case "goodGuess":
+		fmt.Print("Good guess!")
+	case "alreadyGuessed":
+		fmt.Printf("Letter '%s' was already used", guess)
+	case "badGuess":
+		fmt.Printf("Bad guess, '%s' is not in the word", guess)
+	case "lost":
+		fmt.Print("You lost :(! The word was: ")
+		drawLetters(g.Letters)
+	case "won":
+		fmt.Print("YOU WON! The word was: ")
+		drawLetters(g.Letters)
+	}
+	fmt.Println()
 }
