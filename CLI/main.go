@@ -4,9 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
-	// "time"
 	"flag"
-
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 )
@@ -33,7 +31,11 @@ type Entry struct {
 }
 
 func main() {
-	fmt.Println("HELLO")
+	fmt.Println(".....................................")
+	fmt.Println("WELCOME CLI")
+	fmt.Println("show actions with: ./cli -action help")
+	fmt.Println(".....................................")
+
 	action := flag.String("action", "list", "Action to perform on the dictionnary")
 
 	db := dbStore{}
@@ -54,12 +56,21 @@ func main() {
 		fmt.Println("case action.....")
 	case "add": 
 		actionAdd(&db, flag.Args())
+	case "addmany":
+		actionAddMany(&db, flag.Args())
+	case "view":
+		actionGet(&db, flag.Args())
+	case "update":
+		actionUpdate(&db, flag.Args())
+	case "delete":
+		actionRemove(&db, flag.Args())
+	case "deleteall":
+		actionRemoveAll(&db)
+	case "help":
+		actionHelp()
 	default:
 		fmt.Printf("unknown action: %v", *action)
 	}
-
-	// debug
-	// actionList(&db)
 }
 
 func (store *dbStore) Open() error {
@@ -67,7 +78,6 @@ func (store *dbStore) Open() error {
 	if err != nil {
 		return err
 	}
-	log.Println("Connected to DB")
 	db.MustExec(schema)
 	store.db = db
 	return nil
@@ -93,10 +103,51 @@ func actionAdd(store *dbStore, args []string) {
 	fmt.Println("Added to entry !")
 }
 
-func actionDefine() {
-	// call method get
+func actionAddMany(store *dbStore, args []string) {
+	title := args[0]
+	definition := args[1]
+	store.AddMany(title, definition)
+	fmt.Println("Added more to entry !")
 }
 
-func actionRemove() {
-	// call method remove
+func actionGet(store *dbStore, args []string) {
+	title := args[0]
+	entry, err := store.Get(title)
+	if err != nil {
+		log.Fatal("error to view")
+	}
+	fmt.Printf("%v", entry)
+}
+
+func actionUpdate(store *dbStore, args []string) {
+	title := args[0]
+	definition := args[1]
+	store.Update(title, definition)
+	fmt.Println("Updated definition to entry !")
+}
+
+func actionRemove(store *dbStore, args []string) {
+	title := args[0]
+	store.Remove(title)
+	fmt.Println("Removed to entry !")
+}
+
+func actionRemoveAll(store *dbStore) {
+	store.RemoveAll()
+	fmt.Println("Removed all to entry !")
+}
+
+func actionHelp() {
+	fmt.Println("-------------------------------------")
+	fmt.Println("./cli -action help")
+	fmt.Println("./cli -action list")
+	fmt.Println("./cli -action action")
+	fmt.Println("./cli -action add title "+"definition")
+	fmt.Println("./cli -action addmany title "+"definition")
+	fmt.Println("./cli -action view title")
+	fmt.Println("./cli -action update title "+"definition")
+	fmt.Println("./cli -action delete title")
+	fmt.Println("./cli -action deleteall")
+
+	fmt.Println("-------------------------------------")
 }
